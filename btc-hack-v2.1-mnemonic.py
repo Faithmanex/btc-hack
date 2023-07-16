@@ -1,12 +1,9 @@
-# BTC hack v2.1
-# Made by David Gilbert
-# https://github.com/davidmgilbert/btc-hack
-# https://www.davidmgilbert.com
 #!/usr/bin/python3
 
 import hashlib
 import os
 import random
+import time
 import binascii
 import requests 
 import ecdsa
@@ -76,7 +73,7 @@ def wif(masterkey):
     return str(base58.b58encode(binascii.unhexlify(str(var80) + str(var[0:8]))), 'utf-8')
 
 def get_balance(address):
-    #time.sleep(0.2) #This is to avoid over-using the API and keep the program running indefinately. (Un-comment if exceeding requests)
+    time.sleep(0.2) #This is to avoid over-using the API and keep the program running indefinitely. (Un-comment if exceeding requests)
     try:
         response = requests.get("https://api.blockcypher.com/v1/btc/main/addrs/" + str(address) + "/balance")
         return float(response.json()['balance']) 
@@ -146,24 +143,23 @@ def create_main_window(settings):
                sg.Text('', size=(30,1), font=('Comic sans ms', 10), key='_WINS_')],
               [sg.Text('')],
               [sg.Output(size=(87, 20), font=('Comic sans ms', 8), key='out')],
-              [sg.Text('Mnemonic dictionary file:', size=(12,1), font=('Comic sans ms', 10)),sg.In(size=(65, 1),key='-in-'), sg.FileBrowse()],
+              [sg.Text('Mnemonic dictionary file:', size=(12,1), font=('Comic sans ms', 10)),sg.In(size=(45, 1),key='-in-'), sg.FileBrowse()],
               [sg.Button('Start/Stop',  font=('Comic sans ms', 10))]]
 
-    return sg.Window('BTC Hack v2.1 - mnemonic',
+    return sg.Window('BTC Hack v2.1',
                      layout=layout,
                      default_element_size=(9,1))
 
 
-
 def main():
-    window, settings = None, load_settings(SETTINGS_FILE, DEFAULT_SETTINGS )
+    window, settings = None, load_settings(SETTINGS_FILE, DEFAULT_SETTINGS)
     generator = False
     attempts = 0
     successes = 0
     while True:
         if window is None:
             window = create_main_window(settings)
-        event, values = window.Read(timeout=10)
+        event, values = window.read(timeout=10)
         window.Element('_TRIES_').Update(str(attempts))
         window.Element('_WINS_').Update(str(successes))
         if event in (None, 'Exit'):
@@ -185,25 +181,25 @@ def main():
             data = (masterkey, address)
             balance = get_balance(data[1])
             if (balance == 0.00000000):
-                 print('mnemonic and passphrase:   '+str(mnemonic)+ ' ' +str(passphrase)+'\n'+
-                  'private key:                           '+str(masterkey)+'\n'+
-                  'address:                                 '+str(address)+'\n'+
-                  'wif:                                        '+str(WIF)+"\n"+
-                   "Balance: " + str(balance) + "\n\n")
+                print('mnemonic and passphrase:   '+str(mnemonic)+ ' ' +str(passphrase)+'\n'+
+                      'private key:                           '+str(masterkey)+'\n'+
+                      'address:                                 '+str(address)+'\n'+
+                      'wif:                                        '+str(WIF)+"\n"+
+                      "Balance: " + str(balance) + "\n\n")
             elif (balance > 0.00000000):
                 successes = successes + 1
                 file = open("found.txt","a")
                 file.write('mnemonic and passphrase:   '+str(mnemonic)+ ' ' +str(passphrase)+'\n'+
-                  'private key:                           '+str(masterkey)+'\n'+
-                  'address:                                 '+str(address)+'\n'+
-                  'wif:                                        '+str(WIF)+"\n"+
-                   "Balance: " + str(balance) + "\n\n")
+                           'private key:                           '+str(masterkey)+'\n'+
+                           'address:                                 '+str(address)+'\n'+
+                           'wif:                                        '+str(WIF)+"\n"+
+                           "Balance: " + str(balance) + "\n\n")
                 file.close()
                 print('mnemonic and passphrase:   '+str(mnemonic)+ ' ' +str(passphrase)+'\n'+
-                  'private key:                           '+str(masterkey)+'\n'+
-                  'address:                                 '+str(address)+'\n'+
-                  'wif:                                        '+str(WIF)+"\n"+
-                   "Balance: " + str(balance) + "\n\n")
+                      'private key:                           '+str(masterkey)+'\n'+
+                      'address:                                 '+str(address)+'\n'+
+                      'wif:                                        '+str(WIF)+"\n"+
+                      "Balance: " + str(balance) + "\n\n")
             
         elif event == 'Settings':
             event, values = create_settings_window(settings).read(close=True)
@@ -214,7 +210,6 @@ def main():
 
 
     
-    window.Close()
+    window.close()
     
 main()
-
